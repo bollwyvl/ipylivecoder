@@ -1,13 +1,14 @@
 define [
   "d3"
   "underscore"
+  "inlet"
   "codemirror/lib/codemirror"
   "widgets/js/widget"
   "base/js/namespace"
   # silent
   "codemirror/mode/javascript/javascript"
 ],
-(d3, _, CodeMirror, widget, IPython)->
+(d3, _, Inlet, CodeMirror, widget, IPython)->
   class LivecoderView extends widget.DOMWidgetView
     className: "livecoder container-fluid"
 
@@ -43,6 +44,8 @@ define [
         mode: "javascript"
         value: @m("script") or ""
         lineNumbers: true
+
+      Inlet @cm
 
       @cm.on "change", =>
         @m "script", @cm.getValue()

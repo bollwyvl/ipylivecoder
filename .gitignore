@@ -10,3 +10,4 @@ build/
 dist/
 !ipytangle/**dist/
 *.pyc
+livecoder/static/livecoder/lib/inlet/lib/CodeMirror3

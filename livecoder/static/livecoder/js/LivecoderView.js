@@ -4,7 +4,7 @@
     extend = function(child, parent) { for (var key in parent) { if (hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; },
     hasProp = {}.hasOwnProperty;
 
-  define(["d3", "underscore", "codemirror/lib/codemirror", "widgets/js/widget", "base/js/namespace", "codemirror/mode/javascript/javascript"], function(d3, _, CodeMirror, widget, IPython) {
+  define(["d3", "underscore", "inlet", "codemirror/lib/codemirror", "widgets/js/widget", "base/js/namespace", "codemirror/mode/javascript/javascript"], function(d3, _, Inlet, CodeMirror, widget, IPython) {
     var LivecoderView;
     return LivecoderView = (function(superClass) {
       extend(LivecoderView, superClass);
@@ -60,6 +60,7 @@
           value: this.m("script") || "",
           lineNumbers: true
         });
+        Inlet(this.cm);
         return this.cm.on("change", (function(_this) {
           return function() {
             _this.m("script", _this.cm.getValue());

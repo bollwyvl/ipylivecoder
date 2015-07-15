@@ -6,7 +6,13 @@
 
   require.config({
     paths: {
-      d3: ext + "/lib/d3/d3"
+      d3: ext + "/lib/d3/d3",
+      inlet: ext + "/lib/inlet/inlet"
+    },
+    shim: {
+      inlet: {
+        exports: "Inlet"
+      }
     }
   });
 
