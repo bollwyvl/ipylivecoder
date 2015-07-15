@@ -1,0 +1,19 @@
+{
+  "name": "livecoder",
+  "version": "0.0.0",
+  "authors": [
+    "Nicholas Bollweg <nick.bollweg@gmail.com>"
+  ],
+  "license": "BSD",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "livecoder/static/livecoder/lib",
+    "test",
+    "tests"
+  ],
+  "dependencies": {
+    "d3": "~3.5.6"
+  }
+}

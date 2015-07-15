@@ -1,0 +1,28 @@
+{
+  "author": {
+    "name": "Nicholas Bollweg",
+    "url": "https://github.com/bollwyvl"
+  },
+  "description": "",
+  "devDependencies": {
+    "coffee-script": "~1.9.2",
+    "less": "~2.5.0",
+    "watch": "~0.16.0",
+    "jade": "~1.11.0"
+  },
+  "license": "BSD",
+  "main": "index.js",
+  "name": "ipytangle",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/bollwyvl/ipylivecoder.git"
+  },
+  "scripts": {
+    "coffee": "./node_modules/.bin/coffee -cw -o livecoder/static/livecoder/js/ livecoder/static/src/coffee/*.coffee",
+    "less": "./node_modules/.bin/lessc livecoder/static/src/less/livecoder.less livecoder/static/livecoder/css/livecoder.css ",
+    "watch-less": "./node_modules/.bin/watch 'npm run less' livecoder/static/src/less",
+    "jade": "./node_modules/.bin/jade --watch livecoder/static/src/jade/*.jade -o livecoder/static/livecoder/",
+    "live": "./bin/npm_watch_multiple.sh watch-less coffee jade"
+  },
+  "version": "0.0.0"
+}
