@@ -4,6 +4,7 @@ require.config
   paths:
     d3: "#{ext}/lib/d3/d3"
     inlet: "#{ext}/lib/inlet/inlet"
+    jshint: "#{ext}/lib/jshint"
   shim:
     inlet:
       exports: "Inlet"

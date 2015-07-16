@@ -4,8 +4,29 @@
     extend = function(child, parent) { for (var key in parent) { if (hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; },
     hasProp = {}.hasOwnProperty;
 
-  define(["d3", "underscore", "inlet", "codemirror/lib/codemirror", "widgets/js/widget", "base/js/namespace", "codemirror/mode/javascript/javascript"], function(d3, _, Inlet, CodeMirror, widget, IPython) {
-    var LivecoderView;
+  define(["d3", "underscore", "inlet", "backbone", "codemirror/lib/codemirror", "widgets/js/widget", "base/js/namespace", "codemirror/mode/javascript/javascript", "codemirror/mode/css/css", "jshint", "codemirror/addon/lint/lint", "codemirror/addon/lint/javascript-lint", "codemirror/addon/fold/foldcode", "codemirror/addon/fold/foldgutter", "codemirror/addon/fold/brace-fold", "codemirror/addon/fold/comment-fold"], function(d3, _, Inlet, Backbone, CodeMirror, widget, IPython) {
+    var LivecoderView, panes;
+    panes = {
+      html: {
+        icon: "html5",
+        cm: {
+          mode: "xml"
+        }
+      },
+      script: {
+        icon: "code",
+        cm: {
+          mode: "javascript",
+          lint: true
+        }
+      },
+      style: {
+        icon: "css3",
+        cm: {
+          mode: "css"
+        }
+      }
+    };
     return LivecoderView = (function(superClass) {
       extend(LivecoderView, superClass);
 
@@ -13,6 +34,8 @@
         this.m = bind(this.m, this);
         this.initCodeMirror = bind(this.initCodeMirror, this);
         this.iframeLoaded = bind(this.iframeLoaded, this);
+        this.theme = bind(this.theme, this);
+        this.updateButtons = bind(this.updateButtons, this);
         this.update = bind(this.update, this);
         this.render = bind(this.render, this);
         return LivecoderView.__super__.constructor.apply(this, arguments);
@@ -25,25 +48,87 @@
         this.d3 = d3.select(this.el).style({
           width: "100%"
         });
-        this.$row = this.d3.append("div").classed({
-          "row": 1
+        this.$theme = d3.select("head").append("link").attr({
+          rel: "stylesheet",
+          href: this.theme()
         });
-        this.$out = this.$row.append("div").classed({
+        this.$inRow = this.d3.append("div").classed({
+          row: 1,
+          "livecoder-in-row": 1
+        });
+        this.$bar = this.d3.append("div").classed({
           "col-md-6": 1
+        }).append("div").classed({
+          "btn-group": 1
+        });
+        this.$btn = this.$bar.selectAll(".btn").data(d3.entries(panes)).enter().append("button").classed({
+          btn: 1,
+          "btn-default": 1,
+          "btn-mini": 1
+        }).call(function(btn) {
+          btn.append("i").attr({
+            "class": function(d) {
+              return "fa-" + d.value.icon;
+            }
+          }).classed({
+            fa: 1,
+            "fa-fw": 1
+          });
+          return btn.append("span").text(function(arg) {
+            var key;
+            key = arg.key;
+            return key;
+          });
+        }).on("click", (function(_this) {
+          return function(d) {
+            return _this.m("_active", d.key);
+          };
+        })(this));
+        this.$outRow = this.d3.append("div").classed({
+          row: 1,
+          "livecoder-out-row": 1
+        });
+        this.$out = this.$outRow.append("div").classed({
+          "col-md-12": 1
         });
         this.$iframe = this.$out.append("iframe").attr({
           src: "/nbextensions/livecoder/iframe.html"
         }).on("load", this.iframeLoaded());
-        this.$in = this.$row.append("div").classed({
-          "col-md-6": 1
-        });
         return _.defer(this.update);
       };
 
       LivecoderView.prototype.update = function() {
+        var pane, results;
+        this.updateButtons();
         if (!this.cm) {
-          return this.initCodeMirror();
+          this.initCodeMirror();
         }
+        if ("_theme" in this.model.changed) {
+          this.$theme.attr({
+            href: this.theme()
+          });
+          results = [];
+          for (pane in this.cm) {
+            results.push(this.cm.setOption("theme", this.m("_theme")));
+          }
+          return results;
+        }
+      };
+
+      LivecoderView.prototype.updateButtons = function() {
+        var active;
+        active = (this.m("_active")) || "script";
+        return this.$btn.classed({
+          active: function(arg) {
+            var key;
+            key = arg.key;
+            return key === active;
+          }
+        });
+      };
+
+      LivecoderView.prototype.theme = function() {
+        return "/static/components/codemirror/theme/" + (this.m('_theme')) + ".css";
       };
 
       LivecoderView.prototype.iframeLoaded = function() {
@@ -55,16 +140,36 @@
       };
 
       LivecoderView.prototype.initCodeMirror = function() {
-        this.cm = new CodeMirror(this.$in.node(), {
-          mode: "javascript",
-          value: this.m("script") || "",
-          lineNumbers: true
-        });
-        Inlet(this.cm);
-        return this.cm.on("change", (function(_this) {
-          return function() {
-            _this.m("script", _this.cm.getValue());
-            return _this.touch();
+        this.cm = {};
+        return d3.entries(panes).map((function(_this) {
+          return function(arg) {
+            var cm, div, key, value;
+            key = arg.key, value = arg.value;
+            div = _this.$inRow.append("div").classed({
+              "col-md-4": 1
+            });
+            cm = _this.cm[key] = new CodeMirror(div.node(), _.extend({}, value.cm, {
+              value: value.value ? value.value.call(_this) : _this.m("_" + key),
+              gutters: ["CodeMirror-lint-markers"],
+              theme: _this.m("_theme"),
+              matchBrackets: true,
+              autoCloseBrackets: true,
+              foldGutter: true,
+              tabSize: 2,
+              extraKeys: {
+                Tab: function(cm) {
+                  return cm.replaceSelection(Array(cm.getOption("indentUnit") + 1).join(" "));
+                }
+              }
+            }));
+            Inlet(cm);
+            cm.on("change", function() {
+              _this.m("_" + key, cm.getValue());
+              return _this.touch();
+            });
+            return _.delay((function() {
+              return cm.refresh();
+            }), 200);
           };
         })(this));
       };
@@ -83,7 +188,7 @@
 
       return LivecoderView;
 
-    })(widget.DOMWidgetView);
+    })(widget.WidgetView);
   });
 
 }).call(this);

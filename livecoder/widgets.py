@@ -7,7 +7,9 @@ class Livecoder(W.DOMWidget):
     _view_module = T.Unicode("/nbextensions/livecoder/js/widget_livecoder.js",
                              sync=True)
 
-    style = T.Unicode(sync=True)
-    script = T.Unicode(sync=True)
-    html = T.Unicode(sync=True)
+    _style = T.Unicode("/* CSS */", sync=True)
+    _script = T.Unicode("/* JS */", sync=True)
+    _html = T.Unicode("<!-- html -->", sync=True)
+    _theme = T.Unicode("zenburn", sync=True)
+
     width = T.Unicode("100%", sync=True)

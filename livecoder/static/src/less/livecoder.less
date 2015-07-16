@@ -1,7 +1,15 @@
+@import url(/static/components/codemirror/addon/lint/lint.css);
+@import url(/static/components/codemirror/addon/fold/foldgutter.css);
 @import url(../lib/inlet/inlet.css);
 
-iframe {
-  width: 100%;
-  height: 100%;
-  border: none;
+.livecoder {
+  iframe {
+    width: 100%;
+    height: 100%;
+    border: none;
+  }
+
+  .livecoder-in-row > div .CodeMirror {
+    height: 40vh;
+  }
 }

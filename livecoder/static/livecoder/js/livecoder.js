@@ -6,7 +6,7 @@
 
   ext = "/nbextensions/livecoder";
 
-  require([sc + "/underscore/underscore-min.js", sc + "/backbone/backbone-min.js"], function(_, Backbone) {
+  require([sc + "/underscore/underscore-min.js", ext + "/lib/d3/d3.js", sc + "/backbone/backbone-min.js"], function(_, d3, Backbone) {
     var construct, fn, lvc, update;
     construct = function(constructor, args) {
       var Factory;
@@ -18,8 +18,8 @@
     update = (function(_this) {
       return function() {
         var err, src;
-        if ("script" in lvc.changed) {
-          src = "require([\"" + ext + "/lib/d3/d3.min.js\"], function(d3){\n  " + (lvc.get("script")) + "\n});";
+        if ("_script" in lvc.changed) {
+          src = "require([\"" + ext + "/lib/d3/d3.min.js\"], function(d3){\n  " + (lvc.get("_script")) + "\n});";
           try {
             fn = construct(Function, ["model"].concat([src]));
           } catch (_error) {
@@ -27,11 +27,21 @@
             console.log(err.message);
           }
         }
-        try {
-          return fn.apply(window, [lvc]);
-        } catch (_error) {
-          err = _error;
-          return console.log("execution errr", err);
+        if ("_style" in lvc.changed) {
+          d3.select("head").selectAll("style").data([1]).call(function(style) {
+            return style.enter().append("style");
+          }).html(lvc.get("_style"));
+        }
+        if ("_html" in lvc.changed) {
+          d3.select("body").html(lvc.get("_html"));
+        }
+        if (fn) {
+          try {
+            return fn.apply(window, [lvc]);
+          } catch (_error) {
+            err = _error;
+            return console.log("execution errr", err);
+          }
         }
       };
     })(this);
