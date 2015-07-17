@@ -17,7 +17,7 @@
     }
   });
 
-  define(["d3", "./LivecoderView.js"], function(d3, LivecoderView) {
+  define(["d3", "./LivecoderView.js", "./LivecoderModel.js"], function(d3, LivecoderView, LivecoderModel) {
     var css;
     css = ext + "/css/livecoder.css";
     d3.select("head").selectAll("link[href='" + css + "']").data([1]).enter().append("link").attr({
@@ -25,7 +25,8 @@
       href: css
     });
     return {
-      LivecoderView: LivecoderView
+      LivecoderView: LivecoderView,
+      LivecoderModel: LivecoderModel
     };
   });
 

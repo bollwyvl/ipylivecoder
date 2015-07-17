@@ -17,7 +17,7 @@ define [
   "codemirror/addon/fold/brace-fold"
   "codemirror/addon/fold/comment-fold"
 ],
-(d3, _, Inlet, Backbone, CodeMirror, widget, IPython)->
+(d3, _, Inlet, Backbone, CodeMirror, widget, {notebook})->
   panes =
     html:
       icon: "html5"
@@ -37,7 +37,7 @@ define [
     className: "livecoder container-fluid"
 
     render: =>
-      IPython.notebook.keyboard_manager.register_events @$el
+      notebook.keyboard_manager.register_events @$el
 
       @d3 = d3.select @el
         .style width: "100%"
@@ -100,8 +100,8 @@ define [
 
       if "_theme" of @model.changed
         @$theme.attr href: @theme()
-        for pane of @cm
-          @cm.setOption "theme", @m "_theme"
+        for pane, cm of @cm
+          cm.setOption "theme", @m "_theme"
 
     updateButtons: =>
       active = (@m "_active") or "script"

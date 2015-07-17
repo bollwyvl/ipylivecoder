@@ -12,8 +12,9 @@ require.config
 define [
   "d3"
   "./LivecoderView.js"
+  "./LivecoderModel.js"
 ],
-(d3, LivecoderView)->
+(d3, LivecoderView, LivecoderModel)->
   css = "#{ext}/css/livecoder.css"
 
   d3.select "head"
@@ -27,4 +28,5 @@ define [
 
   {
     LivecoderView
+    LivecoderModel
   }

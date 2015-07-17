@@ -12,36 +12,48 @@ require [
     new Factory()
 
   lvc = window._livecoder
-  fn = null
+  fn = ->
 
-  update = =>
-    if "_script" of lvc.changed
-      src = """
-        require(["#{ext}/lib/d3/d3.min.js"], function(d3){
-          #{lvc.get "_script"}
-        });
-      """
-      try
-        fn = construct Function, ["model"].concat [src]
-      catch err
-        console.log err.message
+  setHTML = ->
+    d3.select "body"
+      .html lvc.get "_html"
 
-    if "_style" of lvc.changed
-      d3.select "head"
-        .selectAll "style"
-        .data [1]
-        .call (style)->
-          style.enter().append "style"
-        .html lvc.get "_style"
+  setScript = ->
+    src = """
+      require(["#{ext}/lib/d3/d3.min.js"], function(d3){
+        #{lvc.get "_script"}
+      });
+    """
+    try
+      fn = construct Function, ["model"].concat [src]
+    catch err
+      console.log err.message
 
-    if "_html" of lvc.changed
-      d3.select "body"
-        .html lvc.get "_html"
+  setStyle = ->
+    d3.select "head"
+      .selectAll "style"
+      .data [1]
+      .call (style)->
+        style.enter().append "style"
+      .html lvc.get "_style"
 
-    if fn
-      try
-        fn.apply window, [lvc]
-      catch err
-        console.log "execution errr", err
+  runScript = ->
+    try
+      fn.apply window, [lvc]
+    catch err
+      console.log "execution errr", err
+
+  update = ->
+    changed = lvc.changed
+    setStyle() unless "_style" not of changed
+    setHTML() unless "_html" not of changed
+    setScript() unless "_script" not of changed
+    runScript()
 
   lvc.on "change", update
+
+  # initialize
+  setHTML()
+  setStyle()
+  setScript()
+  runScript()

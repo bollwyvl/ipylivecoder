@@ -7,45 +7,60 @@
   ext = "/nbextensions/livecoder";
 
   require([sc + "/underscore/underscore-min.js", ext + "/lib/d3/d3.js", sc + "/backbone/backbone-min.js"], function(_, d3, Backbone) {
-    var construct, fn, lvc, update;
+    var construct, fn, lvc, runScript, setHTML, setScript, setStyle, update;
     construct = function(constructor, args) {
       var Factory;
       Factory = constructor.bind.apply(constructor, [null].concat(args));
       return new Factory();
     };
     lvc = window._livecoder;
-    fn = null;
-    update = (function(_this) {
-      return function() {
-        var err, src;
-        if ("_script" in lvc.changed) {
-          src = "require([\"" + ext + "/lib/d3/d3.min.js\"], function(d3){\n  " + (lvc.get("_script")) + "\n});";
-          try {
-            fn = construct(Function, ["model"].concat([src]));
-          } catch (_error) {
-            err = _error;
-            console.log(err.message);
-          }
-        }
-        if ("_style" in lvc.changed) {
-          d3.select("head").selectAll("style").data([1]).call(function(style) {
-            return style.enter().append("style");
-          }).html(lvc.get("_style"));
-        }
-        if ("_html" in lvc.changed) {
-          d3.select("body").html(lvc.get("_html"));
-        }
-        if (fn) {
-          try {
-            return fn.apply(window, [lvc]);
-          } catch (_error) {
-            err = _error;
-            return console.log("execution errr", err);
-          }
-        }
-      };
-    })(this);
-    return lvc.on("change", update);
+    fn = function() {};
+    setHTML = function() {
+      return d3.select("body").html(lvc.get("_html"));
+    };
+    setScript = function() {
+      var err, src;
+      src = "require([\"" + ext + "/lib/d3/d3.min.js\"], function(d3){\n  " + (lvc.get("_script")) + "\n});";
+      try {
+        return fn = construct(Function, ["model"].concat([src]));
+      } catch (_error) {
+        err = _error;
+        return console.log(err.message);
+      }
+    };
+    setStyle = function() {
+      return d3.select("head").selectAll("style").data([1]).call(function(style) {
+        return style.enter().append("style");
+      }).html(lvc.get("_style"));
+    };
+    runScript = function() {
+      var err;
+      try {
+        return fn.apply(window, [lvc]);
+      } catch (_error) {
+        err = _error;
+        return console.log("execution errr", err);
+      }
+    };
+    update = function() {
+      var changed;
+      changed = lvc.changed;
+      if ("_style" in changed) {
+        setStyle();
+      }
+      if ("_html" in changed) {
+        setHTML();
+      }
+      if ("_script" in changed) {
+        setScript();
+      }
+      return runScript();
+    };
+    lvc.on("change", update);
+    setHTML();
+    setStyle();
+    setScript();
+    return runScript();
   });
 
 }).call(this);
