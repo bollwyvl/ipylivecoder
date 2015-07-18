@@ -17,6 +17,7 @@ define [
         "_html"
         "_script"
         "_style"
+        "_active"
       ]
       state
 

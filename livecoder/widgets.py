@@ -19,6 +19,7 @@ class Livecoder(W.DOMWidget):
     _script = T.Unicode("/* JS */", sync=True)
     _html = T.Unicode("<!-- html -->", sync=True)
     _theme = T.Unicode("zenburn", sync=True)
+    _active = T.Dict({"script": True}, sync=True)
 
     width = T.Unicode("100%", sync=True)
 

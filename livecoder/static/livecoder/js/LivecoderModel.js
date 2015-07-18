@@ -23,7 +23,7 @@
       LivecoderModel.prototype.get_state = function() {
         var state;
         state = LivecoderModel.__super__.get_state.call(this);
-        metadata[this.get("description")] = _.pick(state, ["_html", "_script", "_style"]);
+        metadata[this.get("description")] = _.pick(state, ["_html", "_script", "_style", "_active"]);
         return state;
       };
 
