@@ -37,7 +37,7 @@ define [
       view.listenTo @model, "change:_theme", =>
         @cm.setOption "theme", view.m "_theme"
 
-      @cm.on "inputRead", =>
+      @cm.on "keyup", =>
         view.m @attr, @cm.getValue()
         view.touch()
 

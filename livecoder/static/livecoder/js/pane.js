@@ -48,7 +48,7 @@
             return _this.cm.setOption("theme", view.m("_theme"));
           };
         })(this));
-        this.cm.on("inputRead", (function(_this) {
+        this.cm.on("keyup", (function(_this) {
           return function() {
             view.m(_this.attr, _this.cm.getValue());
             return view.touch();
